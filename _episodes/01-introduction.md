@@ -1,6 +1,6 @@
 ---
-title: "Intro to corrections and uncertainties"
-teaching: 10
+title: "Prep: Intro to corrections and uncertainties"
+teaching: 20
 exercises: 0
 questions:
 - "Key question (FIXME)"

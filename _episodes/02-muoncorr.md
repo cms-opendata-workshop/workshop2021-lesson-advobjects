@@ -1,6 +1,6 @@
 ---
 title: "Muon corrections"
-teaching: 15
+teaching: 12
 exercises: 0
 questions:
 - "Key question (FIXME)"

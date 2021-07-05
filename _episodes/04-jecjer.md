@@ -1,7 +1,7 @@
 ---
 title: "Jet corrections"
-teaching: 15
-exercises: 20
+teaching: 12
+exercises: 0
 questions:
 - "How are data/simulation differences dealt with for jets and MET?"
 objectives:
@@ -108,17 +108,6 @@ jet's flavor directly makes calculation of b-tagging efficiencies and scale fact
 ~~~
 {: .language-cpp}
 
->## Challenge: create PAT jets
->
->Run `simulation_patjets_cfg.py`, open the file, and compare the two jet correction and b-tagging methods. Method 1 has `Jet_` and `CorrJet_` branches
->and Method 2 has `PatJet_` and `PatJet_uncorr` branches.
->
->>## Solution
->>An important difference between value_jet_pt and value_uncorr_patjet_pt is how the momentum threshold is applied: in PFJets all uncorrected jets have pT > 15 GeV
->>while in PATJets this is applied to the corrected jets. There are small deviations in the corrected jet momentum between the 2 methods, most likely because
->>of differences between the `rho` collection used for pileup corrections.
->{: .solution}
-{: .discussion}
 
 ## Jet Energy Resolution corrections
 
@@ -168,18 +157,6 @@ subdetectors lose coverage.
 
 ![](../assets/img/uncertainties.PNG)
 
->## Challenge: shifted histograms
->
->Plot and investigate the range of momentum variation given by the JEC uncertainties. Is the difference between the
->raw and corrected momentum larger or smaller than the uncertainty? Use TTree::Draw to make histograms of the various
->momentum distributions. Ideally, show the up and down variations in different colors, and the raw vs corrected momenta
->with different line styles.
->
->>## Solution
->>Draw a histogram, hover over one of the lines, and right click. You should see a menu appear -- select "Set Line Attributes" and
->>a GUI with pop up. This is handy for changing line colors and styles interactively.
->{: .solution}
-{: .challenge}
 
 {% include links.md %}
 
