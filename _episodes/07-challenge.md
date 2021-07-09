@@ -1,5 +1,5 @@
 ---
-title: "Advanced object challenge"
+title: "Offline: Advanced object challenge"
 teaching: 0
 exercises: 30
 questions:

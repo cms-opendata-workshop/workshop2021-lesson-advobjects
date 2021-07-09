@@ -1,5 +1,5 @@
 ---
-title: "Muon corrections"
+title: "Demo: Muon corrections"
 teaching: 12
 exercises: 0
 questions:

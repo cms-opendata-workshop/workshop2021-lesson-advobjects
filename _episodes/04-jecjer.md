@@ -1,5 +1,5 @@
 ---
-title: "Jet corrections"
+title: "Demo: Jet corrections"
 teaching: 12
 exercises: 0
 questions:

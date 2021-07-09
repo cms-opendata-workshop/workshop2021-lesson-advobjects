@@ -1,5 +1,5 @@
 ---
-title: "Heavy flavor tagging"
+title: "Demo: Heavy flavor tagging"
 teaching: 12 min
 exercises: 
 questions:
