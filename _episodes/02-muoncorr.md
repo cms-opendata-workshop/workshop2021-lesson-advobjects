@@ -9,19 +9,19 @@ objectives:
 keypoints:
 - "First key point. Brief Answer to questions. (FIXME)"
 ---
-There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when further analysis or computing is done using the muon momentum, because then the bias in muon momentum will affect the results. For example, if only the information about the number of muons in an event is used, the corrections are not necessary.
+There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when further analysis or computing is done using the muon momentum, because the bias in muon momentum will affect the results. For example, if only the information about the number of muons in an event is used, the corrections are not necessary.
 
 ## The Muon Momentum Scale Corrections
 
-The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are extracted in a two step method. In the first step, initial corrections are obtained in bins of charge, η and ϕ. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
+The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are extracted in a two step method. In the first step, initial corrections are obtained in bins of the charge of the muon and the η and ϕ coordinates of the muon track. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
 
-The misalignments for data and Monte Carlo (MC) are different since the MC events start with no biases but they can be induced during the reconstruction. Corrections have been extracted for both data and MC events.
+The corrections for data and Monte Carlo (MC) are different since the MC events start with no biases but they can be induced during the reconstruction. Corrections have been extracted for both data and MC events.
 
-In this example, the Run1 Rochester Corrections are used with a 2012 dataset and a MC dataset. The official code for the Rochester Corrections can be found in the directory `RochesterCorrections`. The example code for using the corrections is in the `Test` directory.
+In this example, the Run1 Rochester Corrections are used with a 2012 dataset and a MC dataset. The official code for the Rochester Corrections can be found in the directory `RochesterCorrections`. The example code for applying the corrections is in the `Test` directory.
 
 ## Applying the corrections to data and MC
 
-Let's start by opening ROOT in a terminal and compiling the official corrections code.
+Let's start by opening ROOT in a terminal and compiling the official corrections code by running the following lines.
 
 ~~~
 root
@@ -46,16 +46,27 @@ void Analysis::main()
 ~~~
 {: .language-cpp}
 
-The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed to apply the corrections and for the corrected muon properties. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns and performs the given function on each event.
+The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed in applying the corrections and for the corrected values. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns and performs the given function on each event.
+
+This tutorial produces a plot which shows that the corrections have been applied correctly. In the y-axis of the plot we have the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed. After this a few more columns needed for the plot are added.
 
 ~~~
 int applyCorrections(string filename, string pathToFile, bool isData) {
   // Create dataframe from NanoAOD files
   ROOT::RDataFrame df("Events", pathToFile);
+  
+  // Select events with exactly two muons
+  auto df_2mu = df.Filter("nMuon == 2", "Events with exactly two muons");
+
+  // Select events with two muons of opposite charge
+  auto df_os = df_2mu.Filter("Muon_charge[0] != Muon_charge[1]", "Muons with opposite charge");
+
+  // Compute invariant mass of the dimuon system
+  auto df_mass = df_os.Define("Dimuon_mass", computeInvariantMass, {"Muon_pt", "Muon_eta", "Muon_phi", "Muon_mass"});
 ~~~
 {: .language-cpp}
 
-The official functions for applying the corrections take as a parameter a TLorentzVector which is a four-vector that describes the muons momentum and energy. We add a new column called *TLVectors* for the TLorentzVectors by using `Define` and `createVector`.
+Next step in `applyCorrections` is adding TLorentzVectors. The functions for applying the Rochester Corrections take as a parameter a TLorentzVector which is a four-vector that describes the muons momentum and energy. We add a new column called *TLVectors* by using `Define` and the `createVector` function which uses muon pt, eta, phi and mass to create the vectors.
 
 ~~~
 // Create TLorentzVectors
@@ -71,7 +82,21 @@ RVec<TLorentzVector> createVector(RVec<float>& pt, RVec<float>& eta, RVec<float>
 ~~~
 {: .language-cpp}
 
-As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. For MC the rochor class function `momcor_mc` is called and for data `momcor_data`. Both of these functions are found in `rochcor2012wasym.cc`. Below are the functions in `Analysis.C` which are used to call the rochor class functions and to return the corrected TLorentzVectors to a new column.
+As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. We call either `correctDataMuon` or `correctMCMuon` to create a new column for corrected muons.
+
+~~~
+// Run the correctios and add corrected muons as a new column
+  auto df_cor = std::make_unique<RNode>(df_tlv);
+
+  if(isData){
+    df_cor = std::make_unique<RNode>(df_cor->Define("CorrectedMuons", correctDataMuon, {"TLVectors","Muon_charge"}));
+  } else {
+    df_cor = std::make_unique<RNode>(df_cor->Define("CorrectedMuons", correctMCMuon, {"TLVectors","Muon_charge"}));
+  }
+~~~
+{: .language-cpp}
+
+These functions further call the rochor class functions `momcor_mc` and `momcor_data`, which can be found in `rochcor2012wasym.cc`, to apply the corrections. The corrected values of muon variables are then extracted to their own columns and the corrected invariant mass is computed. The dataframe is saved to a new ROOT-file.
 
 ~~~
 // Add corrections to MC muons
@@ -102,7 +127,7 @@ RVec<TLorentzVector> correctDataMuon(RVec<TLorentzVector> muons, RVec<int>& char
 ~~~
 {: .language-cpp}
 
-Compile and run `Analysis.C` by running the following lines in your ROOT-terminal. As a result you get a new ROOT-file with both the old and the new values.
+Compile and run `Analysis.C` by running the following lines in your ROOT-terminal.
 
 ~~~
 .L RochesterCorrections/Test/Analysis.C+
