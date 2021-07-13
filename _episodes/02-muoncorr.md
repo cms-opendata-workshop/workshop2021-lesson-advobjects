@@ -32,33 +32,30 @@ root
 
 Then let's take a look at `Analysis.C` which is where we apply the corrections. 
 
-Explain main here.
+The main function of `Analysis.C` is simply used to call the `applyCorrections` function which takes as a parameter the name of the ROOT-file (without the `.root`-part), path to the ROOT-file and a boolean value of whether the file contains data (`true`) or MC (`false`).
 
 ~~~
 void Analysis::main()
 {
   // Data
   applyCorrections("Run2012BC_DoubleMuParked_Muons", "root://eospublic.cern.ch//eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/Run2012BC_DoubleMuParked_Muons.root", true);
-  // applyCorrections("Run2012BC_DoubleMuParked_Muons", "./RochesterCorrections/Test/Run2012BC_DoubleMuParked_Muons.root", true); // use when saved locally
 
   // MC
   applyCorrections("ZZTo2e2mu", "root://eospublic.cern.ch//eos/opendata/cms/upload/stefan/HiggsToFourLeptonsNanoAODOutreachAnalysis/ZZTo2e2mu.root", false);
-  applyCorrections("ZZTo4mu", "root://eospublic.cern.ch//eos/opendata/cms/upload/stefan/HiggsToFourLeptonsNanoAODOutreachAnalysis/ZZTo4mu.root", false);
 }
 ~~~
 {: .language-cpp}
 
-Explain applyCorrections here.
+The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed to apply the corrections and for the corrected muon properties. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns and performs the given function on each event.
 
 ~~~
-// Apply the corrections to dataset
 int applyCorrections(string filename, string pathToFile, bool isData) {
   // Create dataframe from NanoAOD files
   ROOT::RDataFrame df("Events", pathToFile);
 ~~~
 {: .language-cpp}
 
-Explain createVector here.
+The official functions for applying the corrections take as a parameter a TLorentzVector which is a four-vector that describes the muons momentum and energy. We add a new column called *TLVectors* for the TLorentzVectors by using `Define` and `createVector`.
 
 ~~~
 // Create TLorentzVectors
@@ -74,7 +71,7 @@ RVec<TLorentzVector> createVector(RVec<float>& pt, RVec<float>& eta, RVec<float>
 ~~~
 {: .language-cpp}
 
-Explain correctMuon here.
+As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. For MC the rochor class function `momcor_mc` is called and for data `momcor_data`. Both of these functions are found in `rochcor2012wasym.cc`. Below are the functions in `Analysis.C` which are used to call the rochor class functions and to return the corrected TLorentzVectors to a new column.
 
 ~~~
 // Add corrections to MC muons
@@ -105,7 +102,7 @@ RVec<TLorentzVector> correctDataMuon(RVec<TLorentzVector> muons, RVec<int>& char
 ~~~
 {: .language-cpp}
 
-Compile Analysis.C and run the code.
+Compile and run `Analysis.C` by running the following lines in your ROOT-terminal. As a result you get a new ROOT-file with both the old and the new values.
 
 ~~~
 .L RochesterCorrections/Test/Analysis.C+
