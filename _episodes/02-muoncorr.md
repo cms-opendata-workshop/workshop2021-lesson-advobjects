@@ -138,9 +138,11 @@ pf.main()
 
 ## Plotting the mean invariant mass
 
-`Plot.C` creates a plot of the mean of M(µ+µ-) as a function of η of µ.
+To make sure the corrections have been applied correctly, we create a plot of the mean of M(μ<sup>+</sup>μ<sup>-</sup>) as a function of η of μ<sup>+</sup> and μ<sup>-</sup>. The data is divided into bins by η and a fit is made for each bin. The mean values of the fits are saved to a histogram. This process is done for both η of μ<sup>+</sup> and η of μ<sup>-</sup> and for uncorrected and corrected data and MC. The histograms are plotted resulting in the picture below.
 
-Compile and run the code.
+ADD PLOT
+
+To create the plot compile and run `Plot.C` by running the lines below.
 
 ~~~
 .L Plot.C+
@@ -148,13 +150,7 @@ main()
 ~~~
 {: .language-bash}
 
-Explain what the code does.
 
-~~~
-string code;
-~~~
-{: .language-cpp}
-
-Section to talk about the muon corrections and that tool. Add to the setup page some cloning instructions?
+ADD CLONING INSTRUCTIONS TO SETUP PAGE.
 
 {% include links.md %}
