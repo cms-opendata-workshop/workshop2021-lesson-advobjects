@@ -9,11 +9,11 @@ objectives:
 keypoints:
 - "First key point. Brief Answer to questions. (FIXME)"
 ---
-There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when further analysis or computing is done using the muon momentum, because the bias in muon momentum will affect the results.
+There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when precision measurements are done using the muon momentum, because the bias in muon momentum will affect the results.
 
 ## The Muon Momentum Scale Corrections
 
-The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are extracted in a two step method. In the first step, initial corrections are obtained in bins of the charge of the muon and the η and ϕ coordinates of the muon track. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
+The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are available in the [MuonCorrectionsTool](https://github.com/cms-legacydata-analyses/MuonCorrectionsTool). The correction parameters have been extracted in a two step method. In the first step, initial corrections are obtained in bins of the charge of the muon and the η and ϕ coordinates of the muon track. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
 
 The corrections for data and Monte Carlo (MC) are different since the MC events start with no biases but they can be induced during the reconstruction. Corrections have been extracted for both data and MC events.
 
@@ -146,7 +146,7 @@ ADD PLOT
 To create the plot, make sure you have the corrected data and MC files, `Run2012BC_DoubleMuParked_Muons_Cor.root` and `ZZTo2e2mu_Cor.root`, and compile and run `Plot.C` by running the lines below.
 
 ~~~
-.L Plot.C+
+.L RochesterCorrections/Test/Plot.C+
 main()
 ~~~
 {: .language-bash}
