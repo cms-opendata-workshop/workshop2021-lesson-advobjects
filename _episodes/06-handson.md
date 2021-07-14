@@ -10,25 +10,51 @@ keypoints:
 - "FIXME"
 ---
 
-FIXME describe the exercises. Rename "challenge" to "exercise"?
+Choose your exercise! Complete one of the options for exercise #1 on b-tagging, and then explore the JEC/JER uncertainties in exercise #2.
 
->## Challenge: alternate taggers FIXME TO POET AND PAT
+>## Exercise 1a: alternate b taggers
 >
->Use `edmDumpEventContent` to investiate other b tagging algorithms available as edm::AssociationVector types.
->Add 1-2 new branches for alternate taggers and compare those discriminants to CSV (compile and run cmsRun as you've done before).
+>The statements printed from `addJetCollection` when running `poet_cfg.py` shows the options for 
+>strings that can be used in the `bdiscriminator()` function:
+>~~~
+>The bdiscriminators below will be written to the jet collection in the PATtuple (default is all, see PatAlgos/PhysicsTools/python/tools/jetTools.py)
+>jetBProbabilityBJetTags
+>jetProbabilityBJetTags
+>trackCountingHighPurBJetTags
+>trackCountingHighEffBJetTags
+>simpleSecondaryVertexHighEffBJetTags
+>simpleSecondaryVertexHighPurBJetTags
+>combinedSecondaryVertexBJetTags
+>~~~
+>{: .output}
+>
+>Add 1-2 new branches for alternate taggers and compare those discriminants to CSV.
+>
+>After editing `PatJetAnalyzer.cc`,
+>~~~
+>$ scram b
+>$ cmsRun python/poet_cfg.py False True
+>$ root -l myoutput.root
+>[0] TBrowser b
+>~~~
+>{: .source}
 >
 >>## Solution
->>Let's add the MVA version of CSV and the high purity track counting tagger, which was the most common tagger in 2011.
->>After adding new array declarations and branches in the top sections of `AOD2NanoAOD.cc`, we can open the collections
->>for these alternate taggers:
+>>Let's add the high purity track counting tagger, which was the most common tagger in 2011.
+>>After adding a new array declaration and branch in the top sections of `PatJetAnalyzer.cc`, we can call `bDiscriminator()`
+>>for these alternate tagger:
 >>~~~
->>Handle<JetTagCollection> btagsMVA, btagsTC;
->>iEvent.getByLabel(InputTag("trackCountingHighPurBJetTags"), btagsTC);
->>iEvent.getByLabel(InputTag("combinedSecondaryVertexMVABJetTags"), btagsMVA);
+>>// Declarations
+>>std::vector<double> jet_btag;
+>>std::vector<double> jet_btagTC;
+>>
+>>// Branches
+>>mtree->Branch("jet_btag",&jet_btag);
+>>mtree->Branch("jet_btagTC",&jet_btagTC);
 >>
 >>// inside the jet loop
->>  value_jet_btagmva[value_jet_n] = btagsMVA->operator[](it - jets->begin()).second;
->>  value_jet_btagtc[value_jet_n] = btagsTC->operator[](it - jets->begin()).second;
+>>  jet_btag.push_back(itjet->bDiscriminator("combinedSecondaryVertexBJetTags"));
+>>  jet_btag.push_back(itjet->bDiscriminator("trackCountingHighPurBJetTags"));
 >>~~~
 >>{: .language-cpp}
 >>
@@ -37,39 +63,62 @@ FIXME describe the exercises. Rename "challenge" to "exercise"?
 >{: .solution}
 {: .challenge}
 
->## Challenge: count medium CSV b tags
+>## Exercise 1b: count medium CSV b tags
 >
 >Calculate the number of jets per event that are b tagged according to the medium working point of the CSV algorithm.
+>Store a branch called `jet_nCSVM` and draw it 3 times, applying the scale factor weights and demonstrating the uncertainty. 
+>
+>After editing `PatJetAnalyzer.cc`,
+>~~~
+>$ scram b
+>$ cmsRun python/poet_cfg.py False True
+>$ root -l myoutput.root
+>[0] _file0->cd("myjets")
+>[1] Events->Draw("jet_nCSVM","(btagWeight)")
+>[2] Events->Draw("jet_nCSVM","(btagWeightUp)","p hist same")
+>[3] Events->Draw("jet_nCSVM","(btagWeightDown)","p hist same")
+>~~~
+>{: .source}
 >
 >>## Solution
->>We count the number of "Medium CVS" b-tagged jets by summing up the number of jets with discriminant values greater than 0.679.
+>>We count the number of "Medium CSV" b-tagged jets by summing up the number of jets with discriminant values greater than 0.679.
 >>After adding a variable declaration and branch we can sum up the counter:
 >>
->>FIXME TO POET AND PAT
 >>~~~
->>value_jet_nCSVM = 0;
->>for (auto it = jets->begin(); it != jets->end(); it++){
+>>int jet_nCSVM = 0;
+>>for (std::vector<pat::Jet>::const_iterator itjet=myjets->begin(); itjet!=myjets->end(); ++itjet){
 >>
->>  // skipping bits
+>>  // ... JEC uncert, JER, storing variables...
 >>
->>  value_jet_btag[value_jet_n] = btags->operator[](it - jets->begin()).second
->>  if (value_jet_btag[value_jet_n] > 0.679) value_jet_nCSVM++;
->>  value_jet_n++;
+>>  jet_btag.push_back(itjet->bDiscriminator("combinedSecondaryVertexBJetTags"));
+>>  if (itjet->bDiscriminator("combinedSecondaryVertexBJetTags") > 0.679) jet_nCSVM++;
 >>}
 >>~~~
 >>{: .language-cpp}
+>>
+>>Applying the scale factor weight shifts the mean of the distribution <SOMEHOW>. The uncertainty wraps around the central distribution
+>>with a magnitude of approximately X% in this sample.
+>>![](../assets/img/btagCompUnc.JPG)
 >{: .solution}
 {: .challenge}
 
->## Challenge: create PAT jets
+>## Exercise 2: compare corrected jet momentum distributions with uncertainty 
 >
->Run `simulation_patjets_cfg.py`, open the file, and compare the two jet correction and b-tagging methods. Method 1 has `Jet_` and `CorrJet_` branches
->and Method 2 has `PatJet_` and `PatJet_uncorr` branches.
+>Open `myoutput.root` from either option of Exercise #1 and plot:
+> * Corrected versus uncorrected jet momentum
+> * Corrected jet momentum with JEC up and down uncertainties
+> * Corrected jet momentum with JER up and down uncertainties
+>
+>Which uncertainty dominates?
+>
+>See Exercise #1b for an example of how to draw multiple histograms on the same display. If time permits, "right-click" on the histograms and use
+>the "Set Line Attributes" GUI to change the color and style of your histograms.
 >
 >>## Solution
->>An important difference between value_jet_pt and value_uncorr_patjet_pt is how the momentum threshold is applied: in PFJets all uncorrected jets have pT > 15 GeV
->>while in PATJets this is applied to the corrected jets. There are small deviations in the corrected jet momentum between the 2 methods, most likely because
->>of differences between the `rho` collection used for pileup corrections.
+>>An important difference between jet_pt and corr_jet_pt is how the momentum threshold is applied: all the jets have corrected pT > 15 GeV
+>>so some of the uncorrected (or uncertainty-shifted) momentum values are below the threshold. The JEC uncertainty is considerably larger than
+>>the JER uncertainty -- click the branches one-by-one in a TBrowser and watch the mean value of the histogram change to see this numerically.
+>>![](../assets/img/jetUncorrCorr.JPG) ![](../assets/img/JECJERunc.JPG)
 >{: .solution}
 {: .discussion}
 

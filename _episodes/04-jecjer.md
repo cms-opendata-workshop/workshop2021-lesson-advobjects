@@ -142,7 +142,7 @@ for (std::vector<pat::Jet>::const_iterator itjet=myjets->begin(); itjet!=myjets-
       TRandom3 JERrand;
    
       JERrand.SetSeed(abs(static_cast<int>(itjet->phi()*1e4)));
-      ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factors[0]*(factors[0]+2))*res*pt)/pt);
+      ptscale = max(0.0, JERrand.Gaus(reco_pt,sqrt(factors[0]*(factors[0]+2))*res*reco_pt)/reco_pt);
     }
   }
 }     
