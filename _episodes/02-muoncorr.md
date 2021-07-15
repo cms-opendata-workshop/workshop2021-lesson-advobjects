@@ -9,11 +9,11 @@ objectives:
 keypoints:
 - "First key point. Brief Answer to questions. (FIXME)"
 ---
-There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when further analysis or computing is done using the muon momentum, because the bias in muon momentum will affect the results. For example, if only the information about the number of muons in an event is used, the corrections are not necessary.
+There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when precision measurements are done using the muon momentum, because the bias in muon momentum will affect the results.
 
 ## The Muon Momentum Scale Corrections
 
-The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are extracted in a two step method. In the first step, initial corrections are obtained in bins of the charge of the muon and the η and ϕ coordinates of the muon track. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
+The Muon Momentum Scale Corrections, also known as the Rochester Corrections, are available in the [MuonCorrectionsTool](https://github.com/cms-legacydata-analyses/MuonCorrectionsTool). The correction parameters have been extracted in a two step method. In the first step, initial corrections are obtained in bins of the charge of the muon and the η and ϕ coordinates of the muon track. The reconstruction bias in muon momentum depends on these variables. In the second step, the corrections are fine tuned using the mass of the Z boson.
 
 The corrections for data and Monte Carlo (MC) are different since the MC events start with no biases but they can be induced during the reconstruction. Corrections have been extracted for both data and MC events.
 
@@ -24,6 +24,7 @@ In this example, the Run1 Rochester Corrections are used with a 2012 dataset and
 Let's start by opening ROOT in a terminal and compiling the official corrections code by running the following lines.
 
 ~~~
+cd MuonCorrectionsTool
 root
 .L RochesterCorrections/muresolution.cc++
 .L RochesterCorrections/rochcor2012wasym.cc++
@@ -46,7 +47,7 @@ void Analysis::main()
 ~~~
 {: .language-cpp}
 
-The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed in applying the corrections and for the corrected values. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns and performs the given function on each event.
+The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed in applying the corrections and for the corrected values. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns, performs the given function on each event and saves the results to the new column.
 
 This tutorial produces a plot which shows that the corrections have been applied correctly. In the y-axis of the plot we have the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed. After this a few more columns needed for the plot are added.
 
@@ -82,7 +83,7 @@ RVec<TLorentzVector> createVector(RVec<float>& pt, RVec<float>& eta, RVec<float>
 ~~~
 {: .language-cpp}
 
-As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. We call either `correctDataMuon` or `correctMCMuon` to create a new column for corrected muons.
+As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. In `applyCorrections`, we call either `correctDataMuon` or `correctMCMuon` to create a new column for the corrected muons.
 
 ~~~
 // Run the correctios and add corrected muons as a new column
@@ -96,7 +97,7 @@ As mentioned earlier, the muon momentum scale corrections are different for data
 ~~~
 {: .language-cpp}
 
-These functions further call the rochor class functions `momcor_mc` and `momcor_data`, which can be found in `rochcor2012wasym.cc`, to apply the corrections. The corrected values of muon variables are then extracted to their own columns and the corrected invariant mass is computed. The dataframe is saved to a new ROOT-file.
+These functions further call the rochor class functions `momcor_mc` and `momcor_data` to apply the corrections. In `applyCorrections`, the corrected values of muon variables are then extracted to their own columns and the corrected invariant mass is computed. The dataframe is saved to a new ROOT-file. The rochor class functions can be found in `rochcor2012wasym.cc` if you want to take a look at them.
 
 ~~~
 // Add corrections to MC muons
@@ -138,14 +139,14 @@ pf.main()
 
 ## Plotting the mean invariant mass
 
-To make sure the corrections have been applied correctly, we create a plot of the mean of M(μ<sup>+</sup>μ<sup>-</sup>) as a function of η of μ<sup>+</sup> and μ<sup>-</sup>. The data is divided into bins by η and a fit is made for each bin. The mean values of the fits are saved to a histogram. This process is done for both η of μ<sup>+</sup> and η of μ<sup>-</sup> and for uncorrected and corrected data and MC. The histograms are plotted resulting in the picture below.
+To make sure the corrections have been applied correctly, we create a plot of the mean of M(μ<sup>+</sup>μ<sup>-</sup>) as a function of η of μ<sup>+</sup> and μ<sup>-</sup>. The data is divided into bins by muon η and a fit is made for each bin. The mean values of the fits are saved to a histogram. This process is done for both η of μ<sup>+</sup> and η of μ<sup>-</sup> and for uncorrected and corrected data and MC. The histograms are plotted resulting in the picture below.
 
 ADD PLOT
 
-To create the plot compile and run `Plot.C` by running the lines below.
+To create the plot, make sure you have the corrected data and MC files, `Run2012BC_DoubleMuParked_Muons_Cor.root` and `ZZTo2e2mu_Cor.root`, and compile and run `Plot.C` by running the lines below.
 
 ~~~
-.L Plot.C+
+.L RochesterCorrections/Test/Plot.C+
 main()
 ~~~
 {: .language-bash}
