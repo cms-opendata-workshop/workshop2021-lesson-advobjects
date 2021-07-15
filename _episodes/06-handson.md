@@ -10,9 +10,17 @@ keypoints:
 - "FIXME"
 ---
 
-Choose your exercise! Complete one of the options for exercise #1 on b-tagging, and then explore the JEC/JER uncertainties in exercise #2.
+Choose your exercise! Complete exercise #1 on the muon corrections, and then choose one of the options for exercise #2 on b-tagging.
 
->## Exercise 1a: alternate b taggers
+>## Exercise 2: results of the muon correction
+>Exercise text goes here!
+>
+>> ## Solution
+>> Solution goes here
+>{: .solution}
+{: .challenge}
+
+>## Exercise 2a: alternate b taggers
 >
 >The statements printed from `addJetCollection` when running `poet_cfg.py` shows the options for 
 >strings that can be used in the `bdiscriminator()` function:
@@ -59,11 +67,11 @@ Choose your exercise! Complete one of the options for exercise #1 on b-tagging, 
 >>{: .language-cpp}
 >>
 >>The distributions in ttbar events (excluding events with values of -9 where the tagger wasn't evaluated) look like this:
->>![](../assets/img/TTbar_btaggers.png)
+>>![](../assets/img/btagComp.png)
 >{: .solution}
 {: .challenge}
 
->## Exercise 1b: count medium CSV b tags
+>## Exercise 2b: count medium CSV b tags
 >
 >Calculate the number of jets per event that are b tagged according to the medium working point of the CSV algorithm.
 >Store a branch called `jet_nCSVM` and draw it 3 times, applying the scale factor weights and demonstrating the uncertainty. 
@@ -102,25 +110,6 @@ Choose your exercise! Complete one of the options for exercise #1 on b-tagging, 
 >{: .solution}
 {: .challenge}
 
->## Exercise 2: compare corrected jet momentum distributions with uncertainty 
->
->Open `myoutput.root` from either option of Exercise #1 and plot:
-> * Corrected versus uncorrected jet momentum
-> * Corrected jet momentum with JEC up and down uncertainties
-> * Corrected jet momentum with JER up and down uncertainties
->
->Which uncertainty dominates?
->
->See Exercise #1b for an example of how to draw multiple histograms on the same display. If time permits, "right-click" on the histograms and use
->the "Set Line Attributes" GUI to change the color and style of your histograms.
->
->>## Solution
->>An important difference between jet_pt and corr_jet_pt is how the momentum threshold is applied: all the jets have corrected pT > 15 GeV
->>so some of the uncorrected (or uncertainty-shifted) momentum values are below the threshold. The JEC uncertainty is considerably larger than
->>the JER uncertainty -- click the branches one-by-one in a TBrowser and watch the mean value of the histogram change to see this numerically.
->>![](../assets/img/jetUncorrCorr.JPG) ![](../assets/img/JECJERunc.JPG)
->{: .solution}
-{: .discussion}
 
 {% include links.md %}
 

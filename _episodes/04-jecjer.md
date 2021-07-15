@@ -20,7 +20,9 @@ do simulation and data agree perfectly! The measured energy of jet must be
 corrected so that it can be related to the true energy of its parent particle.
 These corrections account for several effects and are factorized so that each
 effect can be studied independently. All of the corrections in this section are described
-in the [8 TeV Jet energy scale and resolution](https://arxiv.org/abs/1607.03663) paper by CMS.
+in "Jet Energy Scale and Resolution" papers by CMS:
+ * [2011, 7 TeV](https://arxiv.org/pdf/1107.4277.pdf)
+ * [2017, 8 TeV](https://arxiv.org/abs/1607.03663)
 
 ## Correction levels
 
@@ -37,14 +39,16 @@ boson events. One well-measured object (ex: a jet near the center of the detecto
 corrections are derived.
 
 All of these corrections are applied to both data and simulation. Data events are then given "residual" corrections to bring data into line with the corrected
-simulation. A final set of flavor-based corrections are used in certain analyses that are especially sensitive to flavor effects. All of the corrections are
-described in [this paper](https://arxiv.org/pdf/1107.4277.pdf). The figure below shows the result of the L1+L2+L3 corrections on the jet response.
+simulation. A final set of flavor-based corrections are used in certain analyses that are especially sensitive to flavor effects.
+The figure below shows the result of the L1+L2+L3 corrections on the jet response.
 
 ![](../assets/img/responseFlow.PNG)
 
 ## Jet Energy Resolution
 
-Jet Energy Resolution (JER) corrections are applied after JEC on strictly MC simulations. Unlike JEC, which adjusts the mean of the momentun response distribution, JER adjusts the width of the distribution. The ratio of reconstructed transverse momentum to true (generated) transverse momentum forms a Gaussian distributions -- the width of this Gaussian is the JER. In data, where no "true" pT is available, the JER is measured using photon/Z + jet events where the jet recoils against the photon or Z boson, both of which can be measured quite precisely in the CMS detector. The JER is typically smaller in simulation than in data, leading to scale factors that are larger than 1. These scale factors, along with their uncertainties, are accessible in POET in the jet analyzers.
+Jet Energy Resolution (JER) corrections are applied after JEC on strictly MC simulations. Unlike JEC, which adjusts the mean of the momentun response distribution, JER adjusts the width of the distribution. The ratio of reconstructed transverse momentum to true (generated) transverse momentum forms a Gaussian distributions -- the width of this Gaussian is the JER. In data, where no "true" pT is available, the JER is measured using photon/Z + jet events where the jet recoils against the photon or Z boson, both of which can be measured quite precisely in the CMS detector. The JER is typically smaller in simulation than in data, leading to scale factors that are larger than 1. These scale factors, along with their uncertainties, are accessible in POET in the jet analyzers. They are applied using two methods:
+ * [Adjusting the ratio](https://oaktrust.library.tamu.edu/handle/1969.1/173472) of reconstructed to generated momentum using the scale factor (if a well-matched generated jet is found),
+ * Randomly smearing the momentum using a Gaussian distribution based on the resolution and scale factor (if no generated jet is found).
 
 ![](../assets/img/jerfactors.JPG)
 
@@ -102,9 +106,8 @@ jer_ = boost::shared_ptr<SimpleJetCorrector>( new SimpleJetCorrector(*ak5PFPar) 
 ~~~
 {: .language-cpp}
 
-We can now use `jer_->correction()` to access the jet's momentum resolution in simulation. In the code snippet below you can see the two types of JER application:
- * smearing based on the true-vs-reconstructed momentum difference if a generated jet was associated to this `pat::Jet`
- * Gaussian smearing based only on the resolution and scale factor if no good association was found.
+We can now use `jer_->correction()` to access the jet's momentum resolution in simulation. In the code snippet below you can see "scaling" and "smearing" versions of applying the JER scale factors, depending
+on whether or not this `pat::Jet` had a matched generated jet. The random smearing application uses a reproducible seed for the random number generator based on the inherently random azimuthal angle of the jet.
 
 **Note:** this code snippet is simplified by removing lines for handling uncertainties -- that's coming below!
 ~~~
@@ -132,17 +135,17 @@ for (std::vector<pat::Jet>::const_iterator itjet=myjets->begin(); itjet!=myjets-
       double deltaPt = fabs(genJet->pt() - reco_pt);
       double deltaR = reco::deltaR(genJet->p4(),itjet->p4());
       if ((deltaR < 0.25) && deltaPt <= 2*reco_pt*res){
-        double deltapt = (reco_pt - genJet->pt()) * factors[0];
-        ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+        double ptratio = reco_pt/genJet->pt();
+        ptscale = max(0.0, ptratio + factors[0]*(1 - ptratio));
         smeared = true;
       }
     }
     // If that didn't work, use Gaussian smearing with a reproducible seed
-    if (!smeared && factors[0] > 0) {
+    if (!smeared && factors[0] > 1) {
       TRandom3 JERrand;
    
       JERrand.SetSeed(abs(static_cast<int>(itjet->phi()*1e4)));
-      ptscale = max(0.0, JERrand.Gaus(reco_pt,sqrt(factors[0]*(factors[0]+2))*res*reco_pt)/reco_pt);
+      ptscale = max(0.0, 1.0 + JERrand.Gaus(0,res)*sqrt(factors[0]*factors[0] - 1.0));
     }
   }
 }     
@@ -159,7 +162,7 @@ corr_jet_pt.push_back(ptscale*itjet->pt());
 ~~~
 {: .language-cpp}
 
-## Uncertainties FIXME ADD JER
+## Uncertainties
 
 You will have noticed that nested among the JEC and JER code snippets given above were commands related to the uncertainty in these corrections.
 The JEC uncertainties have several sources, shown in the figure below. The L1 (pileup) uncertainty dominates at low momentum,
