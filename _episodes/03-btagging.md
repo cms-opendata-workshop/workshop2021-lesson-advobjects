@@ -53,13 +53,11 @@ float values (such as a b-tagging discriminator). During the creation of `pat::J
 > For examples of working with b tags and RECO jets, see [last year's lesson](https://cms-opendata-workshop.github.io/workshop-lesson-jetmet/02-btagging/index.html).
 {: .callout}
 
-FIXME TO POET AND PAT JETS
 ~~~
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 Handle<std::vector<pat::Jet>> myjets;
 iEvent.getByLabel(jetInput, myjets); // jetInput opens "selectedPatJetsAK5PFCorr"
-
 
 for (std::vector<pat::Jet>::const_iterator itjet=myjets->begin(); itjet!=myjets->end(); ++itjet){
 
@@ -100,7 +98,7 @@ When training a tagging algorithm, it's highly probable that the efficiencies fo
 and data. These differences must be measured and corrected for using "scale factors" constructed from ratios of the efficiencies from different sources. The figures below
 show examples of the b and light quark efficiencies and scale factors as a function of jet momentum ([read more](https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsBTV13001)).
 
-![](../assets/img/bEff.PNG =200x) ![](../assets/img/lightEff.PNG =200x)
+![](../assets/img/bEff.PNG) ![](../assets/img/lightEff.PNG)
 
 In simulation, the relevant efficiencies are defined as:
  * b efficiency = [number of "real b jets" (jets spatially matched to generator-level b hadrons) tagged as b jets] / [number of real b jets]
