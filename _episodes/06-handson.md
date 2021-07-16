@@ -12,7 +12,7 @@ keypoints:
 
 Choose your exercise! Complete exercise #1 on the muon corrections, and then choose one of the options for exercise #2 on b-tagging.
 
->## Exercise 2: results of the muon correction
+>## Exercise 1: results of the muon correction
 >Exercise text goes here!
 >
 >> ## Solution
@@ -20,7 +20,7 @@ Choose your exercise! Complete exercise #1 on the muon corrections, and then cho
 >{: .solution}
 {: .challenge}
 
->## Exercise 2a: alternate b taggers
+>## Exercise 2 option A: alternate b taggers
 >
 >The statements printed from `addJetCollection` when running `poet_cfg.py` shows the options for 
 >strings that can be used in the `bdiscriminator()` function:
@@ -71,7 +71,7 @@ Choose your exercise! Complete exercise #1 on the muon corrections, and then cho
 >{: .solution}
 {: .challenge}
 
->## Exercise 2b: count medium CSV b tags
+>## Exercise 2 option B: count medium CSV b tags
 >
 >Calculate the number of jets per event that are b tagged according to the medium working point of the CSV algorithm.
 >Store a branch called `jet_nCSVM` and draw it 3 times, applying the scale factor weights and demonstrating the uncertainty. 
