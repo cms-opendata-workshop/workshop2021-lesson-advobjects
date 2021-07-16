@@ -104,8 +104,8 @@ Choose your exercise! Complete exercise #1 on the muon corrections, and then cho
 >>~~~
 >>{: .language-cpp}
 >>
->>Applying the scale factor weight shifts the mean of the distribution <SOMEHOW>. The uncertainty wraps around the central distribution
->>with a magnitude of approximately X% in this sample.
+>>Applying the scale factor weight shifts the mean of the distribution down slightly. The uncertainty wraps around the central distribution
+>>with a magnitude of approximately 6% in this sample.
 >>![](../assets/img/btagCompUnc.JPG)
 >{: .solution}
 {: .challenge}
