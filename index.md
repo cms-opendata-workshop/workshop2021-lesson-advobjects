@@ -4,7 +4,7 @@ root: .  # Is the only page that doesn't follow the pattern /:path/index.html
 permalink: index.html  # Is the only page that doesn't follow the pattern /:path/index.html
 ---
 
-![](assets/img/calibrationFlow.PNG)
+![](assets/img/correctionFlow.PNG)
 
 > ## What is this lesson about?
 >
