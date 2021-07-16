@@ -91,14 +91,14 @@ defined based on mis-tagging rate:
  * Medium = ~1% mis-tagging = discriminator > 0.679 
  * Tight = ~0.1% mis-tagging = discriminator > 0.898 
 
-
-## Correcting efficiency differences
+## Calculating efficiencies
 
 When training a tagging algorithm, it's highly probable that the efficiencies for tagging different quark flavors as b jets will vary between simulation
 and data. These differences must be measured and corrected for using "scale factors" constructed from ratios of the efficiencies from different sources. The figures below
 show examples of the b and light quark efficiencies and scale factors as a function of jet momentum ([read more](https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsBTV13001)).
 
-![](../assets/img/bEff.PNG) ![](../assets/img/lightEff.PNG)
+<img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsBTV13001/LTdilep_csvMeffpt.png" alt="b efficiency" width="400"/> 
+<img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsBTV13001/mistag_csvm.png" alt="light efficiency" width="600"/>
 
 In simulation, the relevant efficiencies are defined as:
  * b efficiency = [number of "real b jets" (jets spatially matched to generator-level b hadrons) tagged as b jets] / [number of real b jets]
