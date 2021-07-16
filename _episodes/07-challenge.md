@@ -38,7 +38,7 @@ Open `myoutput.root` and investigate the range of momentum variation given by th
 >
 >Repeat these plots with the additional requirement that the jets be "forward" (`abs(jet_eta) > 3.0`)
 >How do the magnitudes of the uncertainties compare in this region?
-{: .question}
+{: .objectives}
 
 Recall: to draw plots on the ROOT command line use the following syntax:
 ~~~

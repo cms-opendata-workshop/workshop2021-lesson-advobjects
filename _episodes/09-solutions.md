@@ -71,7 +71,7 @@ Open `myoutput.root` and investigate the range of momentum variation given by th
 >>region of the detector, defined loosely by the tracker acceptance region of `abs(eta) < 2.4` precisely to
 >>avoid these larger JEC and JER uncertainties.
 >{: .solution}
-{: .question}
+{: .objectives}
 
 {% include links.md %}
 
