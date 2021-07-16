@@ -3,11 +3,16 @@ title: "Advanced objects hands-on"
 teaching: 0
 exercises: 40
 questions:
-- "FIXME"
+- "How can I visualize the effect of the muon corrections?"
+- "How do I access other b tagging discriminators?"
+- "How do I apply the b tagging scale factors and visualize the uncertainty?"
 objectives:
-- "FIXME"
+- "Practice plotting histograms in ROOT to view POET histograms."
+- "Implement multiple b taggers and count the number of b-tagged jets"
+- "Apply the central and shifted b tagging scale factors"
 keypoints:
-- "FIXME"
+- "Muon corrections are a precision adjustment to a dimuon mass histogram."
+- "B tagging scale factors and uncertainties should be considered for any distribution that relies on b-tagged jets"
 ---
 
 Choose your exercise! Complete exercise #1 on the muon corrections, and then choose one of the options for exercise #2 on b-tagging.
@@ -66,7 +71,10 @@ Choose your exercise! Complete exercise #1 on the muon corrections, and then cho
 >>~~~
 >>{: .language-cpp}
 >>
->>The distributions in ttbar events (excluding events with values of -9 where the tagger wasn't evaluated) look like this:
+>>The distributions in ttbar events (excluding events with null values) look remarkably different! The CSV algorithm is
+>>a typical "multivariate" discriminant that ranges from 0 to 1 while the track counting discriminant represents a
+>>physics-based impact parameter quantity that has a much wider range of values. More information about the various
+>>taggers can be found [here](http://cds.cern.ch/record/1194494?ln=en).
 >>![](../assets/img/btagComp.png)
 >{: .solution}
 {: .challenge}
