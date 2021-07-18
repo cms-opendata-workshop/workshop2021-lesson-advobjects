@@ -91,44 +91,11 @@ defined based on mis-tagging rate:
  * Medium = ~1% mis-tagging = discriminator > 0.679 
  * Tight = ~0.1% mis-tagging = discriminator > 0.898 
 
-## Calculating efficiencies
-
-When training a tagging algorithm, it's highly probable that the efficiencies for tagging different quark flavors as b jets will vary between simulation
-and data. These differences must be measured and corrected for using "scale factors" constructed from ratios of the efficiencies from different sources. The figures below
-show examples of the b and light quark efficiencies and scale factors as a function of jet momentum ([read more](https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsBTV13001)).
+The method used to calculate these efficiencies was described in the introductory episode. The figures below
+show examples of the b and light quark efficiencies and scale factors as a function of jet momentum for the CSV Medium working point ([read more](https://twiki.cern.ch/twiki/bin/view/CMSPublic/PhysicsResultsBTV13001)).
 
 <img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsBTV13001/LTdilep_csvMeffpt.png" alt="b efficiency" width="400"/> 
 <img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsBTV13001/mistag_csvm.png" alt="light efficiency" width="600"/>
-
-In simulation, the relevant efficiencies are defined as:
- * b efficiency = [number of "real b jets" (jets spatially matched to generator-level b hadrons) tagged as b jets] / [number of real b jets]
- * c efficiency = [number of "real c jets" (jets spatially matched to generator-level c hadrons) tagged as c jets] / [number of real c jets]
- * light/gluon efficiency (often called "mistag rate") = [number of "real light/gluon jets" (jets spatially matched to generator-level light hadrons) tagged as light/gluon jets] / [number of real light/gluon jets]
-
-These values are typically computed as functions of the momentum or pseudorapidity of the jet and are computed by analyzers for simulated samples with kinematics relevant to their analysis. In POET, a [BTagging module](https://github.com/cms-legacydata-analyses/PhysObjectExtractorTool/tree/master/BTagging) has been provided for calculating efficiencies. 
-
-As an example, efficiencies for the CSV Medium working point in the top quark pair sample have been computed and stored in lookup function in `PatJetAnalyzer.cc`. The CSV algorithm has a b-quark efficiency of ~60% and a light quark mistag rate of ~1%, as advertised. 
-~~~
-double PatJetAnalyzer::getBtagEfficiency(double pt){
-  if(pt < 25) return 0.263407;
-  else if(pt < 50) return 0.548796;
-  else if(pt < 75) return 0.656801;
-  ...etc...
-  else if(pt < 400) return 0.625296;
-  else return 0.394916;
-}
-
-double PatJetAnalyzer::getLFtagEfficiency(double pt){
-  if(pt < 25) return 0.002394;
-  else if(pt < 50) return 0.012683;
-  else if(pt < 75) return 0.011459;
-  ...etc...
-  else if(pt < 400) return 0.014760;
-  else return 0.011628;
-}
-~~~
-{: .language-cpp}
-![](../assets/img/beffs.PNG)
 
 ## Applying scale factors
 
