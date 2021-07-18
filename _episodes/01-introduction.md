@@ -1,13 +1,22 @@
 ---
 title: "Prep: Intro to corrections and uncertainties"
-teaching: 10
+teaching: 20
 exercises: 0
 questions:
-- "Key question (FIXME)"
+- "How can simulation be used reliably in physics analyses?"
+- "How are algorithm efficiencies measured in data and simulation?"
+- "How can efficiency differences be corrected?"
+- "How do analysts handle uncertainties on corrections?"
 objectives:
-- "First learning objective. (FIXME)"
+- "Learn about common issues in matching simulation to data."
+- "Learn some basic methods for computing algorithm efficiencies in CMS."
+- "Learn to apply scale factors to correct simulation."
 keypoints:
-- "First key point. Brief Answer to questions. (FIXME)"
+- "All CMS simulations must be corrected so that algorithm performance matches in data and simulation."
+- "Efficiencies are measured in data using physics knowledge to isolate groups of common objects, such as Z boson tag-and-probe."
+- "Efficiencies in simulation can also be measured using particle truth information."
+- "Scale factors are ratios of efficiency in data to efficiency in simulation, and are applied using event weights."
+- "All scale factor corrections carry either rate or shape uncertainties."
 ---
 
 Essentially all CMS analyses rely on simulation. Whether to simulate a new physics signal or Standard Model processes, it is imperative that simulation
@@ -39,7 +48,7 @@ In events with these characteristics, we can be reasonably sure based on physics
 
 The figure below shows an example of tag and probe using the Upsilon resonance to measure the global muon identification efficiency for muons with momentum between 6 and 20 GeV. Obviously the efficiency is quite high (as expected) since post probes pass the identification criteria. Tag and probe is the standard technique in CMS for measuring electron and muon efficiencies for all algorithms, typically scanning over various momentum and pseudorapidity ranges.
 
-![](../assets/img/tagprobe.JPG)
+![](../assets/img/tagprobe.PNG)
 
 ## Measuring efficiency in simulation
 
@@ -86,7 +95,7 @@ Any differences between efficiencies in data and simulation should be corrected 
 Scale factors inherit the binning of the efficiency measurements, however they are made. For example, the figure below shows the efficiencies in data and simulation
 for tight muon identification in 2010 data. The corresponding scale factors would be the ratio of the black point to the red point in each bin.
 
-<img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsMUO/VBTF_barrel.png" width="500" />
+<img src="https://twiki.cern.ch/twiki/pub/CMSPublic/PhysicsResultsMUO/VBTF_barrel.png" width=500 />
 
 Scale factors are typically applied to simulation using **event weights**. If a certain scale factor is 1.05, the number of simulated events in that bin should be
 increased by 5% by giving each individual event a weight of 1.05 instead of 1.
