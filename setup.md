@@ -2,8 +2,16 @@
 title: Setup
 ---
 
-> ## Muon Correction code checkout
-> FIXME
+Enter your VM or Docker container for OpenData and get the MuonCorrectionsTool if you do not have it already.
+
+> ## MuonCorrectionsTool checkout
+> 
+> ~~~
+>$ cd ~/CMSSW_5_3_32/src/
+>$ cmsenv
+>$ git clone https://github.com/cms-legacydata-analyses/MuonCorrectionsTool.git 
+>~~~
+>{: .language-bash}
 {: .prereq}
 
 
