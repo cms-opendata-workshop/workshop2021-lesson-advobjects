@@ -49,7 +49,7 @@ void Analysis::main()
 
 The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed in applying the corrections and for the corrected values. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns, performs the given function on each event and saves the results to the new column.
 
-This tutorial produces a plot which shows that the corrections have been applied correctly. In the y-axis of the plot we have the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed. After this a few more columns needed for the plot are added.
+We are later going to do an exercise to make sure the corrections have been applied correctly. We are going to need the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed.
 
 ~~~
 int applyCorrections(string filename, string pathToFile, bool isData) {
@@ -137,21 +137,6 @@ pf.main()
 ~~~
 {: .language-bash}
 
-## Plotting the mean invariant mass
-
-To make sure the corrections have been applied correctly, we create a plot of the mean of M(μ<sup>+</sup>μ<sup>-</sup>) as a function of η of μ<sup>+</sup> and μ<sup>-</sup>. The data is divided into bins by muon η and a fit is made for each bin. The mean values of the fits are saved to a histogram. This process is done for both η of μ<sup>+</sup> and η of μ<sup>-</sup> and for uncorrected and corrected data and MC. The histograms are plotted resulting in the picture below.
-
-ADD PLOT
-
-To create the plot, make sure you have the corrected data and MC files, `Run2012BC_DoubleMuParked_Muons_Cor.root` and `ZZTo2e2mu_Cor.root`, and compile and run `Plot.C` by running the lines below.
-
-~~~
-.L RochesterCorrections/Test/Plot.C+
-main()
-~~~
-{: .language-bash}
-
-
-ADD CLONING INSTRUCTIONS TO SETUP PAGE.
+And that's it! As a result you can find `Run2012BC_DoubleMuParked_Muons_Cor.root` and `ZZTo2e2mu_Cor.root` in the `Test` directory. These files contain both corrected and uncorrected values.
 
 {% include links.md %}
