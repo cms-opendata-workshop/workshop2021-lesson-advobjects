@@ -5,9 +5,9 @@ exercises: 0
 questions:
 - "How to correct biased muon momentum?"
 objectives:
-- "Learn how to apply muon momentum scale corrections to data and MC"
+- "Learn how to apply muon momentum scale corrections to data and MC."
 keypoints:
-- "First key point. Brief Answer to questions. (FIXME)"
+- "Rochester corrections are used to scale the muon momentum so that simulation better matches data."
 ---
 There are misalignments in the CMS detector that make the reconstruction of muon momentum biased. The CMS reconstruction software does not fully correct these misalignments and additional corrections are needed to remove the bias. Correcting the misalignments is important when precision measurements are done using the muon momentum, because the bias in muon momentum will affect the results.
 
