@@ -33,7 +33,7 @@ root
 
 Then let's take a look at `Analysis.C` which is where we apply the corrections. 
 
-The main function of `Analysis.C` is simply used to call the `applyCorrections` function which takes as a parameter the name of the ROOT-file (without the `.root`-part), path to the ROOT-file and a boolean value of whether the file contains data (`true`) or MC (`false`).
+The main function of `Analysis.C` is simply used for calling the `applyCorrections` function which takes as a parameter the name of the ROOT-file (without the `.root`-part), path to the ROOT-file and a boolean value of whether the file contains data (`true`) or MC (`false`).
 
 ~~~
 void Analysis::main()
@@ -47,88 +47,95 @@ void Analysis::main()
 ~~~
 {: .language-cpp}
 
-The first thing `applyCorrections` does is create an RDataFrame from the ROOT-file. The RDataFrame can be thought of as an array where the variables from the ROOT-file make up columns. We use the RDataFrame function `Define` to add new columns for variables needed in applying the corrections and for the corrected values. `Define` takes as a parameter the name of the new column, a function and a list of RDataFrame columns. `Define` automatically loops over the given columns, performs the given function on each event and saves the results to the new column.
-
-We are later going to do an exercise to make sure the corrections have been applied correctly. We are going to need the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed.
+The first thing `applyCorrections` does is create a TTree from the ROOT-file. Then variables for holding the values read from the tree are created and branch addresses are set so that the variables are populated when looping over events. New branches for the corrected values, an output file and a few variables needed for the corrections are also created.
 
 ~~~
 int applyCorrections(string filename, string pathToFile, bool isData) {
-  // Create dataframe from NanoAOD files
-  ROOT::RDataFrame df("Events", pathToFile);
-  
-  // Select events with exactly two muons
-  auto df_2mu = df.Filter("nMuon == 2", "Events with exactly two muons");
-
-  // Select events with two muons of opposite charge
-  auto df_os = df_2mu.Filter("Muon_charge[0] != Muon_charge[1]", "Muons with opposite charge");
-
-  // Compute invariant mass of the dimuon system
-  auto df_mass = df_os.Define("Dimuon_mass", computeInvariantMass, {"Muon_pt", "Muon_eta", "Muon_phi", "Muon_mass"});
+  // Create TTree from ROOT file
+  TFile *f1 = TFile::Open((pathToFile).c_str());
+  TTree *DataTree = (TTree*)f1->Get("Events");
 ~~~
 {: .language-cpp}
 
-Next step in `applyCorrections` is adding TLorentzVectors. The functions for applying the Rochester Corrections take as a parameter a TLorentzVector which is a four-vector that describes the muons momentum and energy. We add a new column called *TLVectors* by using `Define` and the `createVector` function which uses muon pt, eta, phi and mass to create the vectors.
+Next, we loop over the events and apply the corrections. We are later going to do an exercise to make sure the corrections have been applied correctly. We are going to need the invariant mass of μ<sup>+</sup>μ<sup>-</sup>, which is why the events are filtered to muon pairs with opposite charges and the invariant mass is computed.
 
 ~~~
-// Create TLorentzVectors
-RVec<TLorentzVector> createVector(RVec<float>& pt, RVec<float>& eta, RVec<float>& phi, RVec<float>& mass) {
-  TLorentzVector mu1;
-  TLorentzVector mu2;
-  mu1.SetPtEtaPhiM(pt[0], eta[0], phi[0], mass[0]);
-  mu2.SetPtEtaPhiM(pt[1], eta[1], phi[1], mass[1]);
-  RVec<TLorentzVector> vectors {mu1, mu2};
+// Loop over events
+  Int_t nEntries = (Int_t)DataTree->GetEntries();
 
-  return vectors;
-}
+  for (Int_t k=0; k<nEntries; k++) {
+    DataTree->GetEntry(k);
+
+    // Select events with exactly two muons
+    if (nMuon == 2 ) {
+      // Select events with two muons of opposite charge
+      if (Muon_charge[0] != Muon_charge[1]) {
+
+        // Compute invariant mass of the dimuon system
+        Dimuon_mass = computeInvariantMass(Muon_pt[0], Muon_pt[1], Muon_eta[0], Muon_eta[1], Muon_phi[0], Muon_phi[1], Muon_mass[0], Muon_mass[1]);
+        bDimuon_mass->Fill();
 ~~~
 {: .language-cpp}
 
-As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both. In `applyCorrections`, we call either `correctDataMuon` or `correctMCMuon` to create a new column for the corrected muons.
+We then loop over the muons in an event and create a TLorentzVector for each muon. The functions for applying the Rochester Corrections take as a parameter a TLorentzVector which is a four-vector that describes the muons momentum and energy. As mentioned earlier, the muon momentum scale corrections are different for data and MC and therefore there are separate functions for both: `momcor_data` and `momcor_mc`. These functions can be found in `rochcor2012wasym.cc` if you want to take a closer look at them.
 
 ~~~
-// Run the correctios and add corrected muons as a new column
-  auto df_cor = std::make_unique<RNode>(df_tlv);
+        // Loop over muons in event
+        for (UInt_t i=0; i<nMuon; i++) {
 
-  if(isData){
-    df_cor = std::make_unique<RNode>(df_cor->Define("CorrectedMuons", correctDataMuon, {"TLVectors","Muon_charge"}));
-  } else {
-    df_cor = std::make_unique<RNode>(df_cor->Define("CorrectedMuons", correctMCMuon, {"TLVectors","Muon_charge"}));
+          // Fill positive and negative muons eta branches
+          if (Muon_charge[i] > 0) {
+            Muon_eta_pos[i] = Muon_eta[i];
+            bMuon_eta_pos->Fill();
+          } else {
+            Muon_eta_neg[i] = Muon_eta[i];
+            bMuon_eta_neg->Fill();
+          }
+
+          // Create TLorentzVector
+          TLorentzVector mu;
+          mu.SetPtEtaPhiM(Muon_pt[i], Muon_eta[i], Muon_phi[i], Muon_mass[i]);
+
+          // Apply the corrections
+          if (isData) {
+            rmcor.momcor_data(mu, Muon_charge[i], runopt, qter);
+          } else {
+            rmcor.momcor_mc(mu, Muon_charge[i], ntrk, qter);
+          }
+~~~
+{: .language-cpp}
+
+The corrected values are then saved to the new branches and the corrected invariant mass is computed. The new tree is filled and written to the output file.
+
+~~~
+          // Save corrected values
+          Muon_pt_cor[i] = mu.Pt();
+          bMuon_pt_cor->Fill();
+          Muon_eta_cor[i] = mu.Eta();
+          bMuon_eta_cor->Fill();
+          Muon_phi_cor[i] = mu.Phi();
+          bMuon_phi_cor->Fill();
+          Muon_mass_cor[i] = mu.M();
+          bMuon_mass_cor->Fill();
+        }
+
+        // Compute invariant mass of the corrected dimuon system
+        Dimuon_mass_cor = computeInvariantMass(Muon_pt_cor[0], Muon_pt_cor[1], Muon_eta_cor[0], Muon_eta_cor[1], Muon_phi_cor[0], Muon_phi_cor[1], Muon_mass_cor[0], Muon_mass_cor[1]);
+        bDimuon_mass_cor->Fill();
+
+      }
+    }
+    //Fill the corrected values to the new tree
+    DataTreeCor->Fill();
   }
+  
+  //Save the new tree
+  DataTreeCor->Write();
+
 ~~~
 {: .language-cpp}
 
-These functions further call the rochor class functions `momcor_mc` and `momcor_data` to apply the corrections. In `applyCorrections`, the corrected values of muon variables are then extracted to their own columns and the corrected invariant mass is computed. The dataframe is saved to a new ROOT-file. The rochor class functions can be found in `rochcor2012wasym.cc` if you want to take a look at them.
-
-~~~
-// Add corrections to MC muons
-RVec<TLorentzVector> correctMCMuon(RVec<TLorentzVector> muons, RVec<int>& charge) {
-  rochcor2012 rmcor; // make the pointer of rochcor class
-  float ntrk = 0; //ntrk (number of track layer) is one of input and it can slightly improved the extra smearing
-  float qter = 1.0; // added it by Higgs group’s request to propagate the uncertainty
-
-  rmcor.momcor_mc(muons[0], charge[0], ntrk, qter);
-  rmcor.momcor_mc(muons[1], charge[1], ntrk, qter);
-  RVec<TLorentzVector> vectors {muons[0], muons[1]};
-
-  return vectors;
-}
-
-// Add corrections to data muons
-RVec<TLorentzVector> correctDataMuon(RVec<TLorentzVector> muons, RVec<int>& charge) {
-  rochcor2012 rmcor; // make the notpointer of rochcor class
-  float runopt = 0; //No run dependence for 2012 data, so default of “runopt=0”
-  float qter = 1.0; // added it by Higgs group’s request to propagate the uncertainty
-
-  rmcor.momcor_data(muons[0], charge[0], runopt, qter);
-  rmcor.momcor_data(muons[1], charge[1], runopt, qter);
-  RVec<TLorentzVector> vectors {muons[0], muons[1]};
-
-  return vectors;
-}
-~~~
-{: .language-cpp}
-
-Compile and run `Analysis.C` by running the following lines in your ROOT-terminal.
+Compile and run `Analysis.C` by running the following lines in your ROOT-terminal. You will get a bunch of warnings but you can safely ignore them.
 
 ~~~
 .L RochesterCorrections/Test/Analysis.C+
