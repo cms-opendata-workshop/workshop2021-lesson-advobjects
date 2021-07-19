@@ -33,13 +33,13 @@ root
 
 Then let's take a look at `Analysis.C` which is where we apply the corrections. 
 
-The main function of `Analysis.C` is simply used for calling the `applyCorrections` function which takes as a parameter the name of the ROOT-file (without the `.root`-part), path to the ROOT-file and a boolean value of whether the file contains data (`true`) or MC (`false`).
+The main function of `Analysis.C` is simply used for calling the `applyCorrections` function which takes as a parameter the name of the ROOT-file (without the `.root`-part), path to the ROOT-file and a boolean value of whether the file contains data (`true`) or MC (`false`). The data file is now commented because it would take too much time to run it during the workshop.
 
 ~~~
 void Analysis::main()
 {
   // Data
-  applyCorrections("Run2012BC_DoubleMuParked_Muons", "root://eospublic.cern.ch//eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/Run2012BC_DoubleMuParked_Muons.root", true);
+  // applyCorrections("Run2012BC_DoubleMuParked_Muons", "root://eospublic.cern.ch//eos/opendata/cms/derived-data/AOD2NanoAODOutreachTool/Run2012BC_DoubleMuParked_Muons.root", true);
 
   // MC
   applyCorrections("ZZTo2e2mu", "root://eospublic.cern.ch//eos/opendata/cms/upload/stefan/HiggsToFourLeptonsNanoAODOutreachAnalysis/ZZTo2e2mu.root", false);
@@ -144,6 +144,6 @@ pf.main()
 ~~~
 {: .language-bash}
 
-And that's it! As a result you can find `Run2012BC_DoubleMuParked_Muons_Cor.root` and `ZZTo2e2mu_Cor.root` in the `Test` directory. These files contain both corrected and uncorrected values.
+And that's it! As a result you can find `ZZTo2e2mu_Cor.root` in the `Test` directory. The file contains both corrected and uncorrected values.
 
 {% include links.md %}
