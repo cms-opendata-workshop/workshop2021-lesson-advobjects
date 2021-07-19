@@ -9,7 +9,7 @@ Enter your VM or Docker container for OpenData and get the MuonCorrectionsTool i
 > ~~~
 >$ cd ~/CMSSW_5_3_32/src/
 >$ cmsenv
->$ git clone https://github.com/cms-legacydata-analyses/MuonCorrectionsTool.git 
+>$ git clone git://github.com/cms-legacydata-analyses/MuonCorrectionsTool.git 
 >~~~
 >{: .language-bash}
 {: .prereq}
