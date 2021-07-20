@@ -18,7 +18,7 @@ keypoints:
 Choose your exercise! Complete exercise #1 on the muon corrections, and then choose one of the options for exercise #2 on b-tagging.
 
 >## Exercise 1: results of the muon correction
->Check that the corrections have been applied correctly by plotting the corrected and uncorrected invariant mass of μ<sup>+</sup>μ<sup>-</sup> on the ROOT command line. If everything went right with the corrections, there should be a difference in the invariant masses. Crop the x-axis to be from 84 to 98.
+>Check that the corrections have been applied correctly by plotting the corrected and uncorrected invariant mass of μ<sup>+</sup>μ<sup>-</sup> on the ROOT command line. If everything went right with the corrections, there should be a difference in the invariant masses. Cut the x-axis to be from 84 to 98.
 >
 >Hint: You can find the branch names of the invariant masses from Analysis.C.
 >
@@ -26,9 +26,15 @@ Choose your exercise! Complete exercise #1 on the muon corrections, and then cho
 >> ~~~
 >> $ root RochesterCorrections/Test/ZZTo2e2mu_Cor.root
 >>[0] Events->Draw("Dimuon_mass", "Dimuon_mass > 84 && Dimuon_mass < 98")
->>[1] Events->Draw("Dimuon_mass_cor", "Dimuon_mass_cor > 84 && Dimuon_mass_cor < 98", "hist same")
+>>[1] Events->Draw("Dimuon_mass_cor", "Dimuon_mass > 84 && Dimuon_mass < 98", "hist same"); htemp->SetLineColor(2);
 >>~~~
 >>{: .language-bash}
+>>
+>>You should get something like this:
+>>![](../assets/img/dimuon_mass_MC.png)
+>>
+>> An example of what the plot looks like for data:
+>>![](../assets/img/dimuon_mass_data.png)
 >{: .solution}
 {: .challenge}
 
